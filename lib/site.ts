@@ -248,15 +248,19 @@ export const positioning = {
 export const companySection = {
   eyebrow: "Company",
   heading: "会社概要",
-  note: "※「予定」と記載の項目は、現時点で未確定の情報です。確定次第、更新します。",
+  note: "2026年7月17日に法人登記を完了しました。会社情報は登記内容に基づいています。",
 };
 
 export const companyFields: CompanyField[] = [
   { label: "会社名", value: "NeuMann合同会社" },
   { label: "英語表記", value: "NeuMann LLC" },
   { label: "代表", value: "弓田 隆仁" },
-  { label: "所在地", value: "福島県内（予定）", provisional: true },
-  { label: "設立", value: "2026年（予定）", provisional: true },
+  {
+    label: "所在地",
+    value: "〒963-4317 福島県田村市船引町東部台四丁目98 東部団地4棟5号室",
+  },
+  { label: "設立", value: "2026年7月17日" },
+  { label: "法人番号", value: "6380003006397" },
   {
     label: "事業内容",
     value:
@@ -306,9 +310,7 @@ export const privacy = {
     },
     {
       heading: "2. 利用目的",
-      body: [
-        "取得した個人情報は、次の目的の範囲内で利用します。",
-      ],
+      body: ["取得した個人情報は、次の目的の範囲内で利用します。"],
       list: [
         "お問い合わせへの回答および連絡",
         "研究・実証・協業等に関するご相談への対応",

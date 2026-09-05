@@ -12,7 +12,7 @@ NeuMann合同会社（NeuMann LLC）の公式コーポレートサイトです�
 ## セットアップ
 
 ```bash
-npm install
+npm ci
 ```
 
 ## 開発サーバーの起動
@@ -24,6 +24,9 @@ npm run dev
 ブラウザで http://localhost:3000 を開きます。
 
 ## 本番ビルド
+
+デプロイ環境変数、Preview QA、現在の公開阻害要因は
+[`docs/deployment.md`](docs/deployment.md) を参照してください。
 
 ```bash
 npm run build
@@ -94,7 +97,7 @@ neumann-lp/
 ## 今後追加すべき機能・改善点
 
 - [ ] お問い合わせフォームの送信処理（API Route + Resend/SendGrid 等）
-- [ ] 公開ドメイン確定後、`app/layout.tsx` の `metadataBase` と `lib/site.ts` の `site.url` を設定
+- [ ] 正式ドメインを検証し、Vercel Production の `NEXT_PUBLIC_SITE_URL` を明示設定
 - [ ] OGP画像（`app/opengraph-image.png` の追加）
 - [ ] favicon / apple-touch-icon の設置
 - [ ] News / お知らせセクション（実証・連携・掲載情報の時系列掲載）

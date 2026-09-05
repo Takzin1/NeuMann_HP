@@ -5,6 +5,8 @@
 // （旧LPのコンテンツは lib/content.ts に温存しています）
 // ===========================================================================
 
+import { resolveSiteUrl } from "./site-url.mjs";
+
 // --- 型定義 -----------------------------------------------------------------
 
 export interface NavItem {
@@ -54,7 +56,10 @@ export const site = {
   nameEn: "NeuMann LLC",
   wordmark: "NeuMann",
   tagline: "Research, Development and Implementation Company",
-  url: "", // 公開ドメイン決定後に設定（例: https://neumann-llc.jp）
+  url: resolveSiteUrl(
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.NEXT_PUBLIC_VERCEL_URL,
+  ),
   description:
     "NeuMann合同会社は、AI・DX・地域課題解決の領域で、研究や実証から得られた理論・データ・知見を、現場で機能するプロダクトや仕組みへ翻訳するR&Dカンパニーです。",
 };

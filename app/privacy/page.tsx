@@ -7,6 +7,15 @@ import { privacy, site } from "@/lib/site";
 export const metadata: Metadata = {
   title: `プライバシーポリシー｜${site.name}`,
   description: `${site.name}の個人情報の取り扱いに関する方針を掲載しています。`,
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: `プライバシーポリシー｜${site.name}`,
+    description: `${site.name}の個人情報の取り扱いに関する方針を掲載しています。`,
+    url: new URL("/privacy", site.url).href,
+    type: "website",
+    locale: "ja_JP",
+    siteName: site.nameEn,
+  },
 };
 
 export default function PrivacyPage() {

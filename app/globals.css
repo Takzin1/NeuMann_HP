@@ -2,18 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ===========================================================================
+   NeuMann LLC — base layer
+   仕様: NEUMANN_DESIGN.md
+   =========================================================================== */
+
 @layer base {
   :root {
-    --ai: #1b3a5c;
-    --ai-hover: #27517a;
-    --ai-deep: #13293f;
-    --mori: #1f4e3d;
+    /* header 高はここが唯一の定義。anchor offset も必ずこれを参照すること。 */
+    --header-h: 64px;
+    --anchor-gap: 24px;
+
+    --duration-micro: 120ms;
+    --duration-state: 180ms;
+    --ease-std: cubic-bezier(0.2, 0, 0, 1);
   }
 
   html {
     scroll-behavior: smooth;
-    /* 固定ヘッダー分のアンカーオフセット */
-    scroll-padding-top: 5rem;
+    /* 固定ヘッダー分のアンカーオフセット。個々の section に scroll-mt を
+       重ねがけしないこと（旧実装は 64px と 80px が食い違っていた）。 */
+    scroll-padding-top: calc(var(--header-h) + var(--anchor-gap));
     -webkit-text-size-adjust: 100%;
   }
 
@@ -21,10 +30,13 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* 日本語の約物のアキを詰める。指定した tracking を意図通りに効かせるため。 */
+    font-feature-settings: "palt" 1;
   }
 
   ::selection {
-    background-color: rgba(27, 58, 92, 0.14);
+    background-color: #4d0b13;
+    color: #f3f1ee;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -42,31 +54,111 @@
 }
 
 @layer components {
-  /* キーボード操作時のフォーカスリング（藍） */
-  .focus-ring {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-ai/55 focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
+  /* -------------------------------------------------------------------------
+     Type roles
+     サイズ・行間・字間・ウェイトは分離できない 1 組として扱う。
+     レスポンシブ段（base / md / xl）を内包しているので、
+     .type-* を付けるだけで全幅で階層比が保たれる。
+     行間は日本語を既定にしている。ラテン字のみの見出しは
+     .type-h2 に leading-[1.08] tracking-latin-h2 のように上書きする。
+     ------------------------------------------------------------------------- */
+  .type-display {
+    @apply font-sans font-regular;
+    font-size: 40px;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .type-h2 {
+    @apply font-sans font-regular;
+    font-size: 30px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    /* 狭い幅で和文見出しの最終行に 1〜2 字だけ残るのを防ぐ。
+       新しいトークンではなく、既存ロールへの組版指定。 */
+    text-wrap: balance;
+  }
+  .type-h3 {
+    @apply font-sans font-regular;
+    font-size: 22px;
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+    /* 見出しは balance。和文は分割点が多く、放置すると最終行に
+       1〜2 字だけ残る（320px で顕著）。 */
+    text-wrap: balance;
+  }
+  .type-lead {
+    @apply font-sans font-regular;
+    font-size: 17px;
+    line-height: 1.75;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+  }
+  .type-body {
+    @apply font-sans font-regular;
+    font-size: 16px;
+    line-height: 1.75;
+  }
+  .type-secondary {
+    @apply font-sans font-regular;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  /* 実データ（年・状態・分類・単位・所在）にのみ使う。装飾 eyebrow には使わない。 */
+  .type-mono {
+    @apply font-mono font-medium uppercase;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: 0.06em;
   }
 
-  /* スクロール連動のリビール（控えめ） */
-  .reveal {
-    opacity: 0;
-    transform: translateY(16px);
-    transition:
-      opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
-  }
-
-  .reveal-in {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .reveal {
-      opacity: 1;
-      transform: none;
-      transition: none;
+  @media (min-width: 768px) {
+    .type-display {
+      font-size: 56px;
     }
+    .type-h2 {
+      font-size: 36px;
+    }
+    .type-h3 {
+      font-size: 26px;
+    }
+    .type-lead {
+      font-size: 18px;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .type-display {
+      font-size: 72px;
+    }
+    .type-h2 {
+      font-size: 44px;
+    }
+    .type-h3 {
+      font-size: 32px;
+    }
+    .type-lead {
+      font-size: 20px;
+    }
+  }
+
+  /* -------------------------------------------------------------------------
+     Layout
+     ------------------------------------------------------------------------- */
+  .container-page {
+    @apply mx-auto w-full max-w-container px-6 md:px-10 xl:px-16;
+  }
+
+  /* 縦リズムは 64 / 96 / 120 の 3 段のみ。section ごとに独自の値を持たせない。 */
+  .section {
+    @apply py-16 md:py-24 xl:py-30;
+  }
+
+  /* -------------------------------------------------------------------------
+     Focus
+     Signal Red は Void 上で 2.7:1 しかなく focus ring に使えない。
+     brand 色よりキーボード可視性を優先する。
+     ------------------------------------------------------------------------- */
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-fg focus-visible:ring-offset-2 focus-visible:ring-offset-void;
   }
 }

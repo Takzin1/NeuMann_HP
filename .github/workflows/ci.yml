@@ -1,0 +1,47 @@
+name: Deployment checks
+
+on:
+  push:
+    branches: [main, chore/deployment-hardening]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deployment-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      VERCEL_ENV: preview
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Check rendered metadata
+        env:
+          PREVIEW_QA_EXPECT_NOINDEX: "1"
+        run: |
+          npm start > /tmp/neumann-next.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:3000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          npm run preview-qa
+      - name: Print server log on failure
+        if: failure()
+        run: cat /tmp/neumann-next.log 2>/dev/null || true

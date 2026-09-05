@@ -5,8 +5,8 @@ import { site } from "@/lib/site";
 const title = `${site.name}｜研究と実証を、社会で使われる仕組みへ。`;
 
 export const metadata: Metadata = {
-  // 公開ドメインが決まったら下記を有効化してください
-  // metadataBase: new URL("https://neumann-llc.jp"),
+  metadataBase: new URL(site.url),
+  alternates: { canonical: "/" },
   title,
   description: site.description,
   keywords: [
@@ -26,6 +26,7 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: site.nameEn }],
   openGraph: {
+    url: site.url,
     title,
     description: site.description,
     type: "website",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     title,
     description: site.description,
   },
-  robots: { index: true, follow: true },
+  robots: { index: process.env.VERCEL_ENV !== "preview", follow: true },
 };
 
 export const viewport: Viewport = {

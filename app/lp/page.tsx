@@ -4,6 +4,7 @@
 // 不要になったらこのディレクトリごと削除して構いません。
 // =============================================================================
 import type { Metadata } from "next";
+import { site } from "@/lib/site";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Hero } from "@/components/Hero";
 import { Concept } from "@/components/Concept";
@@ -18,6 +19,15 @@ import { SiteFooter } from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
   title: "NeuMann.LLC｜旧LP（アーカイブ）",
+  alternates: { canonical: "/lp" },
+  openGraph: {
+    title: "NeuMann.LLC｜旧LP（アーカイブ）",
+    description: site.description,
+    url: new URL("/lp", site.url).href,
+    type: "website",
+    locale: "ja_JP",
+    siteName: site.nameEn,
+  },
   robots: { index: false, follow: false },
 };
 

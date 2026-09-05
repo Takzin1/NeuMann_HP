@@ -19,11 +19,7 @@ export default function PrivacyPage() {
           style={{ paddingTop: "calc(var(--header-h) + 64px)" }}
         >
           <div className="max-w-measure">
-            <p className="flex items-center gap-2">
-              <span className="h-px w-8 bg-line" aria-hidden="true" />
-              <span className="type-mono text-fg-muted">Privacy Policy</span>
-            </p>
-            <h1 className="type-h2 mt-6 text-fg">{privacy.title}</h1>
+            <h1 className="type-h2 text-fg">{privacy.title}</h1>
             <p className="type-body mt-6 text-fg-muted">{privacy.intro}</p>
 
             <div className="mt-12 space-y-10">

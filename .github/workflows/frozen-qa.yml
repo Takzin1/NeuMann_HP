@@ -1,0 +1,48 @@
+name: Frozen visual QA
+on:
+  pull_request:
+  push:
+    branches: [feat/frozen-visual-system]
+permissions:
+  contents: read
+concurrency:
+  group: frozen-qa-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  frozen-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Test 320 / 768 / 1440 layouts and fonts
+        run: |
+          export PUPPETEER_EXECUTABLE_PATH="$(command -v google-chrome || command -v chromium)"
+          test -n "$PUPPETEER_EXECUTABLE_PATH"
+          npm start > /tmp/neumann-frozen.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://localhost:3000/ > /dev/null; then break; fi
+            sleep 1
+          done
+          npm run preview-qa -- http://localhost:3000
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frozen-visual-qa
+          path: qa-results/
+          if-no-files-found: warn
+      - name: Server log on failure
+        if: failure()
+        run: cat /tmp/neumann-frozen.log 2>/dev/null || true

@@ -27,7 +27,6 @@ export interface Project {
   features?: string[];
   status: string[];
   note?: string;
-  featured?: boolean;
 }
 
 export interface ServiceItem {
@@ -49,12 +48,33 @@ export interface ContactTypeOption {
 
 // --- 会社・ブランド ----------------------------------------------------------
 
+/**
+ * 公開 URL。環境変数で解決する。
+ *
+ * 優先順位:
+ *   1. NEXT_PUBLIC_SITE_URL … 独自ドメイン。Production で設定する。
+ *   2. NEXT_PUBLIC_VERCEL_URL … Vercel が Preview デプロイごとに自動注入する。
+ *      これにより Preview でも OGP 画像の絶対 URL が正しく解決される。
+ *   3. localhost … ローカル開発時のフォールバック。
+ *
+ * metadataBase は絶対 URL を要求するため、空文字を返さないこと。
+ */
+export const siteUrl = (() => {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL;
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  const vercel = process.env.NEXT_PUBLIC_VERCEL_URL;
+  if (vercel) return `https://${vercel}`;
+
+  return "http://localhost:3000";
+})();
+
 export const site = {
   name: "NeuMann合同会社",
   nameEn: "NeuMann LLC",
-  wordmark: "NeuMann",
+  wordmark: "NEUMANN",
   tagline: "Research, Development and Implementation Company",
-  url: "", // 公開ドメイン決定後に設定（例: https://neumann-llc.jp）
+  url: siteUrl,
   description:
     "NeuMann合同会社は、AI・DX・地域課題解決の領域で、研究や実証から得られた理論・データ・知見を、現場で機能するプロダクトや仕組みへ翻訳するR&Dカンパニーです。",
 };
@@ -69,34 +89,51 @@ export const nav: NavItem[] = [
   { label: "Contact", href: "/#contact" },
 ];
 
-export const footerNav: NavItem[] = [
-  ...nav,
-  { label: "Privacy Policy", href: "/privacy" },
+/**
+ * フッターのリンク群。列見出し（mono 12）を持たせるためグループ構造にしている。
+ * 見出しはサイト構造上の分類であり、装飾ラベルではない。
+ */
+export const footerNav: { heading: string; items: NavItem[] }[] = [
+  {
+    heading: "Work",
+    items: [
+      { label: "Projects", href: "/#projects" },
+      { label: "Services", href: "/#services" },
+    ],
+  },
+  {
+    heading: "Company",
+    items: [
+      { label: "About", href: "/#about" },
+      { label: "会社概要", href: "/#company" },
+      { label: "Contact", href: "/#contact" },
+    ],
+  },
+  {
+    heading: "Legal",
+    items: [{ label: "Privacy Policy", href: "/privacy" }],
+  },
 ];
 
 // --- Hero -------------------------------------------------------------------
 
 export const hero = {
-  eyebrow: "R&D Company",
-  // メインコピー（配列＝改行単位）
-  headline: ["研究と実証を、", "社会で使われる仕組みへ。"],
-  sub: "NeuMannは、AI・DX・地域課題解決の領域で、研究や実証から得られた理論・データ・知見を、現場で機能するプロダクトや制度設計へ翻訳するR&Dカンパニーです。",
+  // NEUMANN_DESIGN.md §4.2 に基づく Hero。静止して完成していること。
+  eyebrow: ["NEUMANN LLC", "AI-NATIVE R&D COMPANY"],
+  // 4 つの独立した活動として 1 行ずつ立てる。1 行に流すと標語に見える。
+  headline: ["Research.", "Build.", "Field.", "Learn."],
+  // 補足ではなく主張なので Primary Text で組む。
+  lead: ["研究・実証の知見を、", "社会で使われるプロダクトへ。"],
+  origin: "FROM FUKUSHIMA, JAPAN",
   ctaPrimary: { label: "事業を見る", href: "/#projects" },
   ctaSecondary: { label: "お問い合わせ", href: "/#contact" },
-  keywords: [
-    "Research",
-    "Development",
-    "Implementation",
-    "Local Innovation",
-    "AI / DX",
-    "Public Impact",
-  ],
+  // capability rail
+  capabilities: ["RESEARCH", "BUILD", "FIELD", "LEARN"],
 };
 
 // --- Mission ----------------------------------------------------------------
 
 export const mission = {
-  eyebrow: "Mission",
   headline: "研究成果や実証知を、\n社会の中で実際に使われる形へ変換する。",
   body: [
     "NeuMannは、大学・地域・行政・民間の間にあるギャップを埋めるためのR&Dカンパニーです。",
@@ -107,7 +144,6 @@ export const mission = {
 // --- What We Do ---------------------------------------------------------------
 
 export const whatWeDo = {
-  eyebrow: "What We Do",
   heading: "研究と現場のあいだで、私たちが担う3つの役割",
   items: [
     {
@@ -131,7 +167,6 @@ export const whatWeDo = {
 // --- Projects -----------------------------------------------------------------
 
 export const projectsSection = {
-  eyebrow: "Projects",
   heading: "現場で検証しながら育てている取り組み",
   lead: "いずれのプロジェクトも、研究・実証で得た知見を出発点に、持続的に運用される仕組みとしての実装を目指しています。",
 };
@@ -153,7 +188,6 @@ export const projects: Project[] = [
     ],
     status: ["PoC", "Public Sector Collaboration"],
     note: "※ 見守りくんは医療・救急・警備サービスの代替ではありません。緊急時は119番・110番等の公的機関へご連絡ください。",
-    featured: true,
   },
   {
     id: "local-ai-dx-research",
@@ -176,7 +210,6 @@ export const projects: Project[] = [
 // --- Services -------------------------------------------------------------------
 
 export const servicesSection = {
-  eyebrow: "Services",
   heading: "研究から運用まで、一連の工程を支援します",
 };
 
@@ -230,23 +263,64 @@ export const services: ServiceItem[] = [
 
 // --- Positioning -------------------------------------------------------------------
 
-export const positioning = {
-  eyebrow: "Positioning",
-  heading: "3つの領域の交点に立つ",
-  body: "NeuMannは、研究機関、開発会社、コンサルティング会社のいずれか一つに閉じる会社ではありません。",
-  lines: [
-    { from: "研究で得られた問いを、", to: "現場で試せる仮説へ。" },
-    { from: "実証で得られたデータを、", to: "継続利用できる仕組みへ。" },
-    { from: "地域の課題を、", to: "社会に展開可能なプロダクトへ。" },
-  ],
-  closing: "その翻訳と実装を担うR&Dカンパニーです。",
-  domains: ["Research", "Product", "Public Implementation"],
+export type OperatingStage = {
+  id: string;
+  /** 段階名。Hero の "Research. Build. Field. Learn." と対応させる。 */
+  stage: string;
+  /** その段階で何をするか（日本語） */
+  body: string;
+  /** その段階で実際に残る成果物・証跡。mono ラベルとして表示する。 */
+  outputs: string[];
+  /** 最終段階にのみ置く、循環を示す一文 */
+  closing?: string;
 };
+
+export const operatingModelSection = {
+  heading: "調べる、つくる、現場に出す、学ぶ。",
+  lead: "NeuMannの仕事は、この4つの段階を一巡させながら進みます。各段階に実際に残る成果物が、そのまま次の段階の入力になります。",
+};
+
+export const operatingModel: OperatingStage[] = [
+  {
+    id: "research",
+    stage: "Research",
+    body: "課題・現場・制度・技術を調べ、検証すべき仮説を定義する。",
+    outputs: [
+      "Research Question",
+      "Hypothesis",
+      "Research Note",
+      "Evidence / Requirements",
+    ],
+  },
+  {
+    id: "build",
+    stage: "Build",
+    body: "仮説を検証可能な形へ翻訳し、必要最小限のプロダクトやプロトタイプとして実装する。",
+    outputs: ["Prototype", "Product", "Code", "Specification"],
+  },
+  {
+    id: "field",
+    stage: "Field",
+    body: "実際の利用環境・現場へ持ち込み、使われ方、運用条件、反応、失敗を観察する。",
+    outputs: [
+      "Field Test",
+      "PoC",
+      "Operational Evidence",
+      "User / Stakeholder Feedback",
+    ],
+  },
+  {
+    id: "learn",
+    stage: "Learn",
+    body: "現場から得られた証拠をもとに、仮説・仕様・優先順位を更新し、残すもの、削るもの、次に調べる問いを決める。",
+    outputs: ["Decision", "Revision", "Learning", "Next Research Question"],
+    closing: "学習は、次の Research へ戻る。",
+  },
+];
 
 // --- Company -------------------------------------------------------------------
 
 export const companySection = {
-  eyebrow: "Company",
   heading: "会社概要",
   note: "2026年7月17日に法人登記を完了しました。会社情報は登記内容に基づいています。",
 };
@@ -271,7 +345,6 @@ export const companyFields: CompanyField[] = [
 // --- Contact -------------------------------------------------------------------
 
 export const contactSection = {
-  eyebrow: "Contact",
   heading: "お問い合わせ",
   lead: "研究・実証・自治体連携・プロダクト開発・取材・協業に関するお問い合わせはこちらからご連絡ください。",
   // フォーム送信機能は準備中のため、メールでの連絡先を併記
@@ -291,7 +364,7 @@ export const contactTypes: ContactTypeOption[] = [
 
 export const footer = {
   name: "NeuMann LLC",
-  tagline: "Research, Development and Implementation Company",
+  tagline: "SCIENCE / PEOPLE / A BRIGHTER TOMORROW",
   copyright: "© 2026 NeuMann LLC. All rights reserved.",
 };
 

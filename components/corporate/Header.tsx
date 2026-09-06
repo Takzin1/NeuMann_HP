@@ -2,14 +2,23 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { Logomark } from "@/components/Logomark";
+import { NeuMannLockup } from "@/components/brand/NeuMannLockup";
 import { nav, site } from "@/lib/site";
 
 export function Header() {
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
 
-  // Escキーでメニューを閉じる
+  // 全画面オーバーレイ表示中は背面をスクロールさせない
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -20,43 +29,37 @@ export function Header() {
   }, [open, close]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-paper/90 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6 sm:px-8 lg:px-10">
-        {/* ブランド */}
+    // 高さは --header-h と完全一致させる。border は box-border で内側に含める。
+    // 背景は Void の不透明塗り。backdrop-blur は仕様上の禁止項目。
+    <header className="fixed inset-x-0 top-0 z-50 h-16 border-b border-line bg-void">
+      <div className="container-page flex h-full items-center justify-between">
+        {/* identity marker。会社名・肩書・所在地をヘッダー内で重ねない。 */}
         <Link
           href="/"
           onClick={close}
-          className="focus-ring flex items-center gap-2.5 rounded-sm"
-          aria-label={`${site.name} トップページ`}
+          className="focus-ring"
+          aria-label={`${site.nameEn} トップページ`}
         >
-          <Logomark className="h-7 w-7" />
-          <span className="flex flex-col leading-none">
-            <span className="text-[17px] font-bold tracking-tight text-ink">
-              {site.wordmark}
-            </span>
-            <span className="mt-0.5 hidden text-[9.5px] uppercase tracking-[0.16em] text-muted sm:block">
-              R&amp;D / Implementation
-            </span>
-          </span>
+          <NeuMannLockup />
         </Link>
 
-        {/* PCナビ */}
         <nav aria-label="メインナビゲーション" className="hidden md:block">
-          <ul className="flex items-center gap-7">
+          <ul className="flex items-center gap-8">
             {nav.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="focus-ring rounded-sm text-[13.5px] font-medium tracking-wide text-muted transition-colors hover:text-ink"
+                  className="focus-ring type-secondary text-fg transition-colors duration-state ease-std hover:text-fg-muted"
                 >
                   {item.label}
                 </Link>
               </li>
             ))}
             <li>
+              {/* 赤が許されるのはこの CTA とロゴの角のみ。 */}
               <Link
                 href="/#contact"
-                className="focus-ring rounded-sm bg-ai px-4 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-ai-hover"
+                className="focus-ring type-secondary inline-flex h-11 items-center rounded-button bg-red px-6 text-fg transition-colors duration-state ease-std hover:bg-red-signal"
               >
                 お問い合わせ
               </Link>
@@ -64,10 +67,9 @@ export function Header() {
           </ul>
         </nav>
 
-        {/* モバイル: ハンバーガー */}
         <button
           type="button"
-          className="focus-ring inline-flex h-10 w-10 items-center justify-center rounded-sm text-ink md:hidden"
+          className="focus-ring -mr-1 inline-flex h-11 w-11 items-center justify-center rounded-button text-fg md:hidden"
           aria-expanded={open}
           aria-controls="mobile-menu"
           aria-label={open ? "メニューを閉じる" : "メニューを開く"}
@@ -78,7 +80,7 @@ export function Header() {
             className="h-5 w-5"
             fill="none"
             stroke="currentColor"
-            strokeWidth="1.8"
+            strokeWidth="1.5"
             strokeLinecap="round"
             aria-hidden="true"
           >
@@ -98,20 +100,20 @@ export function Header() {
         </button>
       </div>
 
-      {/* モバイルメニュー */}
+      {/* 全画面オーバーレイ。header(64px) の下を占有する。 */}
       <div
         id="mobile-menu"
         hidden={!open}
-        className="border-t border-line bg-paper md:hidden"
+        className="fixed inset-x-0 bottom-0 top-16 overflow-y-auto border-t border-line bg-void md:hidden"
       >
-        <nav aria-label="モバイルナビゲーション" className="px-6 py-4">
+        <nav aria-label="モバイルナビゲーション" className="container-page py-4">
           <ul className="flex flex-col">
             {nav.map((item) => (
-              <li key={item.href} className="border-b border-line last:border-b-0">
+              <li key={item.href} className="border-b border-line">
                 <Link
                   href={item.href}
                   onClick={close}
-                  className="focus-ring block rounded-sm py-3.5 text-[15px] font-medium text-ink"
+                  className="focus-ring type-body flex h-11 items-center text-fg"
                 >
                   {item.label}
                 </Link>
@@ -121,7 +123,7 @@ export function Header() {
               <Link
                 href="/#contact"
                 onClick={close}
-                className="focus-ring block rounded-sm bg-ai px-4 py-3 text-center text-[14px] font-semibold text-white hover:bg-ai-hover"
+                className="focus-ring type-secondary flex h-11 items-center justify-center rounded-button bg-red text-fg"
               >
                 お問い合わせ
               </Link>

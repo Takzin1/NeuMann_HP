@@ -11,9 +11,11 @@
   `cd721585b68acb81cd41ed0e4ebadf9a94efc440`.
 
 The application is the complete bundle implementation, replacing the old light
-site and `/lp`. The only visual correction after the source commit removes the
+site and `/lp`. Visual corrections after the source commit remove the
 remaining decorative Privacy Policy eyebrow and its dependent heading margin,
-as required by the Frozen specification. No tokens, colors, assets, archetypes,
+and remove pill radius from its four list markers (pill is reserved for status
+chips). The latter was detected by the first browser CI run; its assertions
+remain unchanged. No tokens, colors, assets, archetypes,
 fonts, project data or metrics were introduced.
 
 ## Verification

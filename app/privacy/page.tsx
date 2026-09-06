@@ -42,7 +42,7 @@ export default function PrivacyPage() {
                             className="type-secondary flex items-start gap-2 text-fg-muted"
                           >
                             <span
-                              className="mt-2 h-1 w-1 shrink-0 rounded-pill bg-fg-faint"
+                              className="mt-2 h-1 w-1 shrink-0 bg-fg-faint"
                               aria-hidden="true"
                             />
                             {item}
